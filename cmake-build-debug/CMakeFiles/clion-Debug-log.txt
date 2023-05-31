@@ -1,0 +1,37 @@
+cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=cmake -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -G "CodeBlocks - Unix Makefiles" -S /home/simi/Dev/game-of-life -B /home/simi/Dev/game-of-life/cmake-build-debug
+-- The C compiler identification is GNU 13.1.1
+-- The CXX compiler identification is GNU 13.1.1
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - failed
+-- Check for working C compiler: /usr/bin/gcc
+-- Check for working C compiler: /usr/bin/gcc - broken
+CMake Error at /usr/share/cmake/Modules/CMakeTestCCompiler.cmake:67 (message):
+  The C compiler
+
+    "/usr/bin/gcc"
+
+  is not able to compile a simple test program.
+
+  It fails with the following output:
+
+    Change Dir: /home/simi/Dev/game-of-life/cmake-build-debug/CMakeFiles/CMakeScratch/TryCompile-yLDF1B
+    
+    Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 cmake -f Makefile cmTC_c154f/fast && CMake Warning:
+      Ignoring extra path from command line:
+    
+       "cmTC_c154f/fast"
+    
+    
+    CMake Error: Unknown argument -f
+    CMake Error: Run 'cmake --help' for all supported options.
+    
+    
+
+  
+
+  CMake will not be able to correctly generate this project.
+Call Stack (most recent call first):
+  CMakeLists.txt:2 (project)
+
+
+-- Configuring incomplete, errors occurred!

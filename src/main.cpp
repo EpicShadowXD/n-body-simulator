@@ -3,6 +3,8 @@
 #include <iostream>
 #include <vector>
 #include <memory>
+#include <cstdlib>
+#include <ctime>
 
 #include "Vector2D.h"
 
@@ -19,17 +21,18 @@ void updateVelocity(Body& body, const std::vector<Body>& bodies, double gravitat
   Vector2D acceleration;
 
   for (const Body& other : bodies) {
-    while (&body == &other) continue;
-    
-    Vector2D direction = other.position - body.position;
+    if (&body != &other) {
 
-    double distance = direction.magnitude();
-    double forceMagnitude = (gravitationalConstant * body.mass * other.mass) / (distance * distance);
+      Vector2D direction = other.position - body.position;
+      double distance = direction.magnitude();
 
-    Vector2D force = direction.normalized() * forceMagnitude;
-    acceleration += force * (1 / body.mass);
+      if (distance > 0.0) {
+        double forceMagnitude = (gravitationalConstant * body.mass * other.mass) / (distance * distance);
+        Vector2D force = direction.normalized() * forceMagnitude + 0.0;
+        acceleration += force * (1.0 / body.mass);
+      }
+    }
   }
-
   body.velocity += acceleration * deltaTime;
 }
 
@@ -37,16 +40,38 @@ void updatePosition(Body& body, double deltaTime) {
   body.position += body.velocity * deltaTime;
 }
 
+void spawnBodies(std::vector<Body>& bodies, std::size_t n, std::size_t screenWidth, std::size_t screenHeight, double minMass, double maxMass) {
+  std::srand(std::time(nullptr));
+
+  for (std::size_t i = 0; i < n; ++i) {
+    double x = std::rand() % screenWidth;
+    double y = std::rand() % screenHeight;
+    double mass = minMass + (static_cast<double>(std::rand()) / RAND_MAX) * (maxMass - minMass);
+
+    bodies.emplace_back(Vector2D(x, y), Vector2D(), mass);
+  }
+}
+
 int main() {
-  constexpr double gravitationalConstant = 6.674e-11;
-  const double deltaTime = 0.1;
+  const std::size_t WIDTH = 800,
+                    HEIGHT = 600;
 
+  constexpr double gravitationalConstant = 6.674e-3;
+  const double deltaTime = 0.05;
+
+  const double positionScale = 0.5;
+  const double velocityScale = 1.0;
+
+  /*
   std::vector<Body> bodies = {
-    Body(Vector2D(0.0, 0.0), Vector2D(0.0, 0.0), 1),
-    Body(Vector2D(100.0, 0.0), Vector2D(0.0, 0.1), 2),
+    Body(Vector2D(0.0 / positionScale, 0.0 / positionScale), Vector2D(0.1 / velocityScale, 0.1 / velocityScale), 100),
+    Body(Vector2D(100.0 / positionScale, 0.0 / positionScale), Vector2D(-0.05 / velocityScale, 0.05 / velocityScale), 200),
   };
+  */ 
+  std::vector<Body> bodies;
+  spawnBodies(bodies, 10, WIDTH, HEIGHT, 6, 10);
 
-  sf::RenderWindow window(sf::VideoMode(800, 600), "N-Body Simulator");
+  sf::RenderWindow window(sf::VideoMode(WIDTH, HEIGHT), "N-Body Simulator");
   sf::CircleShape circle(10.0f);
   circle.setFillColor(sf::Color::Red);
 
@@ -59,6 +84,7 @@ int main() {
     }
 
     for (Body& body : bodies) {
+      // TODO: fix no effect function here
       updateVelocity(body, bodies, gravitationalConstant, deltaTime);
       updatePosition(body, deltaTime);
     }
@@ -67,11 +93,13 @@ int main() {
 
     for (const Body& body : bodies) {
       circle.setPosition(static_cast<float>(body.position.x), static_cast<float>(body.position.y));
+      circle.setRadius(body.mass);
       window.draw(circle);
     }
 
     window.display();
   }
-  
-  return 0;
+ 
+  std::cout << "Exited\n";
 }
+
